@@ -52,8 +52,8 @@ def load_clean_split_data(data_file):
     #print(state_df['Florida'])
     return states, state_df
 
-def set_time_flag(df, state_name):
-    _, frame_df = gen_flag_times()
+def set_time_flag(df, state_name, timeinterval1, timeinterval2, timeinterval3):
+    _, frame_df = gen_flag_times(timeinterval1, timeinterval2, timeinterval3)
     df = pd.concat([df, frame_df], axis=0, join='outer')
     # 将time flag插入
     df = df.reset_index(drop=True)
@@ -113,7 +113,7 @@ def find_flip(df, first_flag):
 
 def save_flag(df, state_name):
     df = df[df['flag'] == 1]
-    save_file = '../data/states_csv/votes_flag_%s_6h_till11-20.csv'%state_name
+    save_file = '../data/states_csv/votes_flag_%s_till11-20.csv'%state_name
     df.to_csv(save_file, index = None)
 
 def save_flip(states, state_df):
@@ -154,10 +154,11 @@ def save_flag_by_time(states, state_df):
 if __name__ == "__main__":
     all_data_file = "../data/all-state-changes.csv"
     states, state_df = load_clean_split_data(all_data_file)
+    timeinterval1, timeinterval2, timeinterval3 = 2, 6, 24
 
     # 对每个州处理并保存数据
     for s in states:
-        state_df[s], first_flag = set_time_flag(state_df[s], s)
+        state_df[s], first_flag = set_time_flag(state_df[s], s, timeinterval1, timeinterval2, timeinterval3)
         state_df[s] = find_flip(state_df[s], first_flag)
         save_flag(state_df[s], s)
         # print("Process done with %s"%s)
